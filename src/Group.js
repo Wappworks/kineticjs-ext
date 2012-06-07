@@ -25,6 +25,15 @@ Kinetic.Group.prototype = {
      * @param {Kinetic.Node} child
      */
     add: function(child) {
+        var childParent = child.getParent();
+        if( childParent != null )
+        {
+            if( childParent === this )
+                return;
+
+            childParent.remove(child);
+        }
+
         this._add(child);
     },
     /**

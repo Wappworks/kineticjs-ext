@@ -16,6 +16,10 @@
   - Increased drawing robustness against bad/missing image data
 - Kinetic.Layer now fires off a 'resize' event whenever the layer size is modified [cbFunc( width:Number, height:Number ):void]
 
+### Bug fixes
+- Hardened Kinetic.Layer and Kinetic.Group against adding children w/ existing [arents
+
+
 ## v3.8.2.2
 ### New Features:
 - Added the ability to mark node for redrawing which triggers an automatic draw
