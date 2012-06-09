@@ -18,6 +18,7 @@
 
 ### Bug fixes
 - Hardened Kinetic.Layer and Kinetic.Group against adding children w/ existing [arents
+- Fixed touch event handlings for clicks and double clicks
 
 
 ## v3.8.2.2

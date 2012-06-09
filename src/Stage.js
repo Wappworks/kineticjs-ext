@@ -390,34 +390,38 @@ Kinetic.Stage.prototype = {
                 }
                 return true;
             }
-
             // handle touchstart
             else if(this.touchStart) {
                 this.touchStart = false;
+                this.clickStart = true;
                 shape._handleEvents('touchstart', evt);
-
-                if(el.ondbltap && shape.inDoubleClickWindow) {
-                    var events = el.ondbltap;
-                    for(var i = 0; i < events.length; i++) {
-                        events[i].handler.apply(shape, [evt]);
-                    }
-                }
-
-                shape.inDoubleClickWindow = true;
-
-                setTimeout(function() {
-                    shape.inDoubleClickWindow = false;
-                }, this.dblClickWindow);
                 return true;
             }
-
             // handle touchend
             else if(this.touchEnd) {
                 this.touchEnd = false;
                 shape._handleEvents('touchend', evt);
+
+                // detect if click or double click occurred
+                if(this.clickStart) {
+                    /*
+                     * if dragging and dropping, don't fire click or dbl click
+                     * event
+                     */
+                    if((!go.drag.moving) || !go.drag.node) {
+                        shape._handleEvents('onclick', evt);
+
+                        if(shape.inDoubleClickWindow) {
+                            shape._handleEvents('ondblclick', evt);
+                        }
+                        shape.inDoubleClickWindow = true;
+                        setTimeout(function() {
+                            shape.inDoubleClickWindow = false;
+                        }, this.dblClickWindow);
+                    }
+                }
                 return true;
             }
-
             /*
             * NOTE: these event handlers require target shape
             * handling
