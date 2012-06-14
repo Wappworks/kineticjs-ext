@@ -437,6 +437,7 @@ Kinetic.Stage.prototype = {
                 if(this.mouseoutShape) {
                     this.mouseoverShape = shape;
                     this.mouseoutShape._handleEvents('onmouseout', evt);
+                    this.mouseoutShape = undefined;
                     this.mouseoverShape = undefined;
                 }
 
