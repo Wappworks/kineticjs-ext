@@ -435,10 +435,12 @@ Kinetic.Stage.prototype = {
                  * events
                  */
                 if(this.mouseoutShape) {
-                    this.mouseoverShape = shape;
-                    this.mouseoutShape._handleEvents('onmouseout', evt);
+                    if( this.mouseoutShape.getStage() != null) {
+                        this.mouseoverShape = shape;
+                        this.mouseoutShape._handleEvents('onmouseout', evt);
+                        this.mouseoverShape = undefined;
+                    }
                     this.mouseoutShape = undefined;
-                    this.mouseoverShape = undefined;
                 }
 
                 shape._handleEvents('onmouseover', evt);
@@ -551,7 +553,8 @@ Kinetic.Stage.prototype = {
          * then run the onmouseout event handlers
          */
         if(!shapeDetected && this.mouseoutShape) {
-            this.mouseoutShape._handleEvents('onmouseout', evt);
+            if(this.mouseoutShape.getStage() != null)
+                this.mouseoutShape._handleEvents('onmouseout', evt);
             this.mouseoutShape = undefined;
         }
     },

@@ -41,10 +41,6 @@ Kinetic.Group.prototype = {
      * @param {Kinetic.Node} child
      */
     remove: function(child) {
-        var childStage = child.getStage();
-        if( childStage.mouseoutShape == child )
-            childStage.mouseoutShape = undefined;
-
         this._remove(child);
     },
     /**
