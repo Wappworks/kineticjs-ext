@@ -9,11 +9,13 @@
  *
  * @config  {String}    name
  * @config  {Boolean}   visible
+ * @config  {Number}    depth
  */
 Kinetic.GridLayer = function(config) {
     // Defaults
     this.name = undefined;
     this.visible = true;
+    this.depth = 0;
 
     // Set properties from config
     if(config != null ) {

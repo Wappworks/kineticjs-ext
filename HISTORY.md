@@ -7,17 +7,25 @@
     - Tileset support is compatible with [Tiled map editor](http://www.mapeditor.org/) tilesets
     - Tiles may be named and its name used in lookups (Kinetic.TileSet::getTile())
   - Added support for tile atlases
-- Kinetic.TileMap
-  - Added support for tilemap shapes. Tilemap shapes are compatible with
+- Kinetic.Grid
+  - Added a grid container shape. The grid container supports grid layers for drawing shapes in a grid. See
+    Kinetic.TileSetGrid for an example which uses Kinetic.Grid and Kinetic.TileSetGridLayer
+- Kinetic.GridLayer
+  - Base class for Kinetic.Grid compatible grid layers.
+- Kinetic.TileSetGridLayer
+  - Kinetic.Grid compatible layer supporting tile set rendering.
+- Kinetic.TileSetGrid
+  - Added a tile set grid renderer. The configuration has been tested with
     [Tiled map editor](http://www.mapeditor.org/) tile layers
   - Increased drawing robustness against bad/missing image data
 - Kinetic.Image
   - Modified to accept Kinetic.TileInfo as a valid image specifier
   - Increased drawing robustness against bad/missing image data
-- Kinetic.Layer now fires off a 'resize' event whenever the layer size is modified [cbFunc( width:Number, height:Number ):void]
+- Kinetic.Layer now fires off a 'resize' event whenever the layer size is modified
+  The callback function specification is cbFunc( width:Number, height:Number ):void
 
 ### Bug fixes
-- Hardened Kinetic.Layer and Kinetic.Group against adding children w/ existing [arents
+- Hardened Kinetic.Layer and Kinetic.Group against adding children w/ existing parents
 - Fixed touch event handlings for clicks and double clicks
 - Fixed crash when a mouse-event listening shape under the mouse pointer is removed
 
