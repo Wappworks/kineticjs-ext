@@ -50,17 +50,17 @@ Kinetic.TileSet.prototype = {
 
     /*
      * Adds a tile sheet to the tile set
-     * @param {Object} config
+     * @param {Config} config
      *
-     * @config {Number}         firstgid            Tile ID start
-     * @config {String|Image}   image               Image or image URL to use
-     * @config {Number}         imagewidth          Image width
-     * @config {Number}         imageheight         Image height
-     * @config {Number}         tilewidth           Tile width
-     * @config {Number}         tileheight          Tile height
-     * @config {Number}         [tilesnum]          Number of tiles in the spritesheet
-     * @config {Object}         [properties]        Tile sheet properties
-     * @config {Object}         [tileproperties]    Tile properties map with the key being each tile's index
+     * @Config {Number}         firstgid            Tile ID start
+     * @Config {String|Image}   image               Image or image URL to use
+     * @Config {Number}         imagewidth          Image width
+     * @Config {Number}         imageheight         Image height
+     * @Config {Number}         tilewidth           Tile width
+     * @Config {Number}         tileheight          Tile height
+     * @Config {Number}         [tilesnum]          Number of tiles in the spritesheet
+     * @Config {Object}         [properties]        Tile sheet properties
+     * @Config {Object}         [tileproperties]    Tile properties map with the key being each tile's index
      *
      * @tileproperties {String} name                Tile name. Use this to specify a custom name that can be used
      *                                              for retrieval

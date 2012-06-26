@@ -38,7 +38,9 @@
 		<file name='${dir.src}/Shape.js'/>
         <file name='${dir.src}/tiles/TileInfo.js'/>
         <file name='${dir.src}/tiles/TileSet.js'/>
-		<file name='${dir.src}/shapes/Rect.js'/>
+        <file name='${dir.src}/gridmap/GridMapLayer.js'/>
+        <file name='${dir.src}/gridmap/TileSetGridMapLayer.js'/>
+        <file name='${dir.src}/shapes/Rect.js'/>
 		<file name='${dir.src}/shapes/Circle.js'/>
 		<file name='${dir.src}/shapes/Image.js'/>
 		<file name='${dir.src}/shapes/Polygon.js'/>
@@ -47,8 +49,9 @@
 		<file name='${dir.src}/shapes/Text.js'/>
         <file name='${dir.src}/shapes/TextMultiline.js'/>
         <file name='${dir.src}/shapes/TileMap.js'/>
+        <file name='${dir.src}/shapes/GridMap.js'/>
         <file name='${dir.src}/layers/LayerCullSimple.js'/>
-	</filelist>
+    </filelist>
 	    
 
 	<property name="dest.pathzip" value="../zip"/>

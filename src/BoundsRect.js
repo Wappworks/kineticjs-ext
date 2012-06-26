@@ -94,12 +94,31 @@ Kinetic.BoundsRect.prototype = {
         return( this.x < rectRight  && myRight > rect.x     &&
             this.y < rectBottom && myBottom > rect.y        );
     },
-    
+
     /*
-     Encloses the target rect
-     @param      {Kinetic.BoundsRect}   rect
-     @returns    {Kinetic.BoundsRect}  the current instance
+        Returns the overlap rect. null if there's no overlap
+        @param {Kinetic.BoundsRect} rect
+        @returns {Boolean}  True if it overlaps
      */
+    getOverlapRect: function( rect ) {
+        var myRight = this.x + this.width,
+            myBottom = this.y + this.height,
+            rectRight = rect.x + rect.width,
+            rectBottom = rect.y + rect.height;
+
+
+        // No overlap? Return null
+        if( this.x < rectRight  && myRight > rect.x && this.y < rectBottom && myBottom > rect.y )
+            return null;
+
+        return Kinetic.BoundsRect.fromBounds( Math.max( this.x, rect.x ), Math.max( this.y, rect.y ), Math.min( myRight, rectRight), Math.min( myBottom, rectBottom) );
+    },
+
+    /*
+    Encloses the target rect
+    @param      {Kinetic.BoundsRect}   rect
+    @returns    {Kinetic.BoundsRect}  the current instance
+    */
     encloseRect: function( rect ) {
         var rightMax = Math.max( this.x + this.width, rect.x + rect.width ),
             bottomMax = Math.max( this.y + this.height, rect.y+ rect.height );

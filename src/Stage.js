@@ -350,7 +350,6 @@ Kinetic.Stage.prototype = {
         var backstageLayer = this.backstageLayer;
         var go = Kinetic.GlobalObject;
         var pos = this.getUserPosition();
-        var el = shape.eventListeners;
 
 
         if(this.targetShape && shape.id === this.targetShape.id) {
@@ -721,7 +720,7 @@ Kinetic.Stage.prototype = {
                 node.onDragUpdate( pos, go.drag.custom );
                 go.drag.node._handleEvents('ondragmove', evt);
             }
-        }, false);
+        });
 
         this.on('mouseup touchend mouseout', function(evt) {
             that._endDrag(evt);
