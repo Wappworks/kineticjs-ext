@@ -12,7 +12,7 @@
  * @config {Number}             x                   Draw x-position
  * @config {Number}             y                   Draw y-position
  */
-Kinetic.GridMap = function( config ) {
+Kinetic.Grid = function( config ) {
     // defaults
     this.spotWidth = 0;
     this.spotHeight = 0;
@@ -36,10 +36,10 @@ Kinetic.GridMap = function( config ) {
     };
 };
 
-Kinetic.GridMap.prototype = {
+Kinetic.Grid.prototype = {
     /*
      *  Adds a layer into the grid map
-     *  @param {Kinetic.GridMapLayer}    layer
+     *  @param {Kinetic.GridLayer}    layer
      */
     add: function( layer ) {
         var layerParent = layer.getParent();
@@ -52,7 +52,7 @@ Kinetic.GridMap.prototype = {
     },
     /*
      *  Remove a layer from the grid map
-     *  @param {Kinetic.GridMapLayer}    layer
+     *  @param {Kinetic.GridLayer}    layer
      */
     remove: function( layer ) {
         var layers = this._layers,
@@ -74,7 +74,7 @@ Kinetic.GridMap.prototype = {
      *  Returns the specified layer. null otherwise
      *  @param  {String|Number}        id
      *
-     *  @returns {Kinetic.GridMapLayer}
+     *  @returns {Kinetic.GridLayer}
      */
     getGridLayer: function( id ) {
         if( this._layerMap.hasOwnProperty(id) )
@@ -334,4 +334,4 @@ Kinetic.GridMap.prototype = {
     }
 };
 // extend Shape
-Kinetic.GlobalObject.extend(Kinetic.GridMap, Kinetic.Shape);
+Kinetic.GlobalObject.extend(Kinetic.Grid, Kinetic.Shape);

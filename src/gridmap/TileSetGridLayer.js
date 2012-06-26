@@ -13,7 +13,7 @@
  * @config {Kinetic.TileSet}    tileSet             The tile set
  * @config {Number[]}           tiles               Array of tile IDs for each spot
  */
-Kinetic.TileSetGridMapLayer = function( config ) {
+Kinetic.TileSetGridLayer = function( config ) {
     // Defaults
     this.x = 0;
     this.y = 0;
@@ -23,7 +23,7 @@ Kinetic.TileSetGridMapLayer = function( config ) {
     this.tiles = null;
 
     // Initialize from the base class
-    Kinetic.GridMapLayer.call(this, config);
+    Kinetic.GridLayer.call(this, config);
 
     if( this.tiles == null )
         this.tiles = new Array( this.width * this.height );
@@ -33,7 +33,7 @@ Kinetic.TileSetGridMapLayer = function( config ) {
  *  Returns the grid bounds
  *  @returns {Kinetic.BoundsRect}
  */
-Kinetic.TileSetGridMapLayer.prototype = {
+Kinetic.TileSetGridLayer.prototype = {
     /*
      *  Draws the layer
      *
@@ -175,4 +175,4 @@ Kinetic.TileSetGridMapLayer.prototype = {
     }
 };
 // extend GridMapLayer
-Kinetic.GlobalObject.extend(Kinetic.TileSetGridMapLayer, Kinetic.GridMapLayer);
+Kinetic.GlobalObject.extend(Kinetic.TileSetGridLayer, Kinetic.GridLayer);

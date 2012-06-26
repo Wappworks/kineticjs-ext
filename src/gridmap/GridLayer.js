@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////
-//  GridMapLayer
+//  GridLayer
 ///////////////////////////////////////////////////////////////////////
 /**
- * GridMapLayer constructor
+ * GridLayer constructor
  * @constructor
  *
  * @param   {Object}    config
@@ -10,7 +10,7 @@
  * @config  {String}    name
  * @config  {Boolean}   visible
  */
-Kinetic.GridMapLayer = function(config) {
+Kinetic.GridLayer = function(config) {
     // Defaults
     this.name = undefined;
     this.visible = true;
@@ -34,7 +34,7 @@ Kinetic.GridMapLayer = function(config) {
  *  Returns the grid bounds
  *  @returns {Kinetic.BoundsRect}
  */
-Kinetic.GridMapLayer.prototype = {
+Kinetic.GridLayer.prototype = {
     /*
      *  Draws the layer
      *

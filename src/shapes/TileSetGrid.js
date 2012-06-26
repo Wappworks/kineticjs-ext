@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-//  Tile map render
+//  Tile set grid
 ///////////////////////////////////////////////////////////////////////
 /**
  * Tilemap constructor
@@ -12,7 +12,7 @@
  * @config {Kinetic.TileSet}    tileSet             The tile set
  * @config {Number[]}           tiles               Array of tile IDs for each spot
  */
-Kinetic.TileMap = function( config ) {
+Kinetic.TileSetGrid = function( config ) {
     // defaults
     this.gridColumns = 0;
     this.gridRows = 0;
@@ -20,10 +20,10 @@ Kinetic.TileMap = function( config ) {
     this.tiles = undefined;
 
     // call super constructor
-    Kinetic.GridMap.call(this, config);
+    Kinetic.Grid.call(this, config);
 
     // Create the tile set layer...
-    this._tileSetLayer = new Kinetic.TileSetGridMapLayer({
+    this._tileSetLayer = new Kinetic.TileSetGridLayer({
         width: this.gridColumns,
         height: this.gridRows,
         tileSet: this.tileSet,
@@ -38,7 +38,7 @@ Kinetic.TileMap = function( config ) {
     delete this.tiles;
 };
 
-Kinetic.TileMap.prototype = {
+Kinetic.TileSetGrid.prototype = {
     /*
      *  Returns the tile assigned to a grid coordinate
      *  @param {Number}    gridX
@@ -51,4 +51,4 @@ Kinetic.TileMap.prototype = {
     }
 };
 // extend Shape
-Kinetic.GlobalObject.extend(Kinetic.TileMap, Kinetic.GridMap);
+Kinetic.GlobalObject.extend(Kinetic.TileSetGrid, Kinetic.Grid);
