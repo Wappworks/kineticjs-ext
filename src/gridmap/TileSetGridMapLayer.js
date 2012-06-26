@@ -54,9 +54,9 @@ Kinetic.TileSetGridMapLayer.prototype = {
         tiles = this.tiles;
         tileIndexStart = gridBounds.x + (gridBounds.y * this.width );
         posXStart = gridBounds.x * spotWidth;
-        for( rowCurr = 0, posY = gridBounds.y * spotHeight; rowCurr < gridBounds.width; rowCurr++, posY += spotHeight )
+        for( rowCurr = 0, posY = gridBounds.y * spotHeight; rowCurr < gridBounds.height; rowCurr++, posY += spotHeight )
         {
-            for( colCurr = 0, tileIndex = tileIndexStart, posX = posXStart; colCurr < gridBounds.height; colCurr++, tileIndex++, posX += spotWidth )
+            for( colCurr = 0, tileIndex = tileIndexStart, posX = posXStart; colCurr < gridBounds.width; colCurr++, tileIndex++, posX += spotWidth )
             {
                 tileCurr = this.tileSet.getTile( tiles[tileIndex] );
                 if( tileCurr == null )

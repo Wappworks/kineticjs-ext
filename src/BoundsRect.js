@@ -107,11 +107,11 @@ Kinetic.BoundsRect.prototype = {
             rectBottom = rect.y + rect.height;
 
 
-        // No overlap? Return null
+        // Overlaps? Return the correct boundaries
         if( this.x < rectRight  && myRight > rect.x && this.y < rectBottom && myBottom > rect.y )
-            return null;
+            return Kinetic.BoundsRect.fromBounds( Math.max( this.x, rect.x ), Math.max( this.y, rect.y ), Math.min( myRight, rectRight), Math.min( myBottom, rectBottom) );
 
-        return Kinetic.BoundsRect.fromBounds( Math.max( this.x, rect.x ), Math.max( this.y, rect.y ), Math.min( myRight, rectRight), Math.min( myBottom, rectBottom) );
+        return null;
     },
 
     /*

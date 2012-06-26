@@ -48,8 +48,8 @@
 		<file name='${dir.src}/shapes/Star.js'/>
 		<file name='${dir.src}/shapes/Text.js'/>
         <file name='${dir.src}/shapes/TextMultiline.js'/>
-        <file name='${dir.src}/shapes/TileMap.js'/>
         <file name='${dir.src}/shapes/GridMap.js'/>
+        <file name='${dir.src}/shapes/TileMap.js'/>
         <file name='${dir.src}/layers/LayerCullSimple.js'/>
     </filelist>
 	    

@@ -28,7 +28,6 @@ Kinetic.GridMap = function( config ) {
     this._layers = [];
     this._layerMap = {};
     this._gridBounds = new Kinetic.BoundsRect( 0, 0, 0, 0);
-    this._bounds = new Kinetic.BoundsRect( 0, 0, this.gridColumns * this.spotWidth, this.gridRows * this.spotHeight );
     this._overlap = {
         left: 0,
         right: 0,
@@ -77,7 +76,7 @@ Kinetic.GridMap.prototype = {
      *
      *  @returns {Kinetic.GridMapLayer}
      */
-    getLayer: function( id ) {
+    getGridLayer: function( id ) {
         if( this._layerMap.hasOwnProperty(id) )
             return( this._layerMap[id] );
 
@@ -109,7 +108,6 @@ Kinetic.GridMap.prototype = {
     {
         Kinetic.Shape.prototype.invalidateBoundsLocal.apply( this );
         this._gridBounds = null;
-        this._bounds = null;
         this._overlap = null;
     },
     /*
@@ -279,7 +277,7 @@ Kinetic.GridMap.prototype = {
 
         if( isForDetection )
         {
-            mapBounds = this._bounds;
+            mapBounds = this._getNodeBoundsUntransformed();
             drawCtx.beginPath();
             drawCtx.rect( mapBounds.x, mapBounds.y, mapBounds.width, mapBounds.height );
             drawCtx.closePath();
@@ -291,7 +289,7 @@ Kinetic.GridMap.prototype = {
             return;
 
         // Get the canvas extents in local space...
-        canvas = this.getContext();
+        canvas = this.getCanvas();
         transform = this.getTransformView();
         transform.invert();
         viewportBounds = new Kinetic.BoundsRect( 0, 0, canvas.width, canvas.height );
@@ -330,13 +328,9 @@ Kinetic.GridMap.prototype = {
      * @returns {Kinetic.BoundsRect}
      */
     _calcNodeBoundsLocalUntransformed: function() {
-        if( this._bounds == null )
-        {
-            var gridBounds = this.getGridBounds();
-            this._bounds = new Kinetic.BoundsRect( gridBounds.x * this.spotWidth, gridBounds.y * this.spotHeight, gridBounds.width * this.spotWidth, gridBounds.height * this.spotHeight );
-        }
-
-        return( this.bounds );
+        var gridBounds = this.getGridBounds(),
+            bounds = new Kinetic.BoundsRect( gridBounds.x * this.spotWidth, gridBounds.y * this.spotHeight, gridBounds.width * this.spotWidth, gridBounds.height * this.spotHeight );
+        return( bounds );
     }
 };
 // extend Shape
