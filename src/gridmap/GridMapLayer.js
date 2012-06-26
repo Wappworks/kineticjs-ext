@@ -8,10 +8,12 @@
  * @param   {Object}    config
  *
  * @config  {String}    name
+ * @config  {Boolean}   visible
  */
 Kinetic.GridMapLayer = function(config) {
     // Defaults
     this.name = undefined;
+    this.visible = true;
 
     // Set properties from config
     if(config != null ) {
@@ -41,15 +43,29 @@ Kinetic.GridMapLayer.prototype = {
      *  @param  {Number}                spotWidth
      *  @param  {Number}                spotHeight
      */
-    draw: function( drawCtx, gridBounds, spotWidth, spotHeight )
-    {
+    draw: function( drawCtx, gridBounds, spotWidth, spotHeight ) {
+    },
+    /*
+     *  Sets the layer visibility
+     *
+     *  @param  {Boolean}         isVisible
+     */
+    setVisible: function( visible ) {
+        this.visible = visible;
+    },
+    /*
+     *  Returns true if it's visible. false otherwise.
+     *
+     *  @returns  {Boolean}
+     */
+    isVisible: function() {
+        return( this.visible );
     },
     /*
      *  Sets the parent
      *  @param    {Kinetic.GridMap} parent
      */
-    setParent: function( parent )
-    {
+    setParent: function( parent ) {
         if( parent === null )
             parent = undefined;
 
@@ -59,16 +75,14 @@ Kinetic.GridMapLayer.prototype = {
      *  Returns the parent grid or undefined if it's not attached
      *  @returns    {Kinetic.GridMap}
      */
-    getParent: function()
-    {
+    getParent: function() {
         return( this._parent );
     },
     /*
      *  Returns the grid bounds overlap
      *  @returns    {Kinetic.BoundsRect}
      */
-    getGridBounds: function()
-    {
+    getGridBounds: function() {
         return( new Kinetic.BoundsRect(0,0,0,0) );
     },
     /*
@@ -83,8 +97,7 @@ Kinetic.GridMapLayer.prototype = {
      *  @Overlap    {Number}    top
      *  @Overlap    {Number}    bottom
      */
-    getOverlap: function(spotWidth, spotHeight)
-    {
+    getOverlap: function(spotWidth, spotHeight) {
         return( {
             left: 0,
             right: 0,
@@ -96,8 +109,7 @@ Kinetic.GridMapLayer.prototype = {
     /*
      *  Mark the layer for redraw
      */
-    markForRedraw: function()
-    {
+    markForRedraw: function() {
         var parent = this.getParent();
         if( parent != null )
             parent.markForRedraw();

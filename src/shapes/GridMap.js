@@ -273,7 +273,7 @@ Kinetic.GridMap.prototype = {
             spotStartX, spotStartY,
             spotStopX, spotStopY,
             drawGridBounds,
-            layerIndex, layerGridBounds;
+            layerIndex, layerCurr, layerGridBounds;
 
         drawCtx = this.getContext();
 
@@ -315,9 +315,13 @@ Kinetic.GridMap.prototype = {
 
         for( layerIndex = 0; layerIndex < layersNum; layerIndex++ )
         {
-            layerGridBounds = drawGridBounds.getOverlapRect( layers[layerIndex].getGridBounds() );
+            layerCurr = layers[layerIndex];
+            if( !layerCurr.isVisible() )
+                continue;
+
+            layerGridBounds = drawGridBounds.getOverlapRect( layerCurr.getGridBounds() );
             if( layerGridBounds !== null )
-                layers[ layerIndex ].draw( drawCtx, layerGridBounds, this.spotWidth, this.spotHeight );
+                layerCurr.draw( drawCtx, layerGridBounds, this.spotWidth, this.spotHeight );
         }
     },
 

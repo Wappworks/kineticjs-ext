@@ -12,8 +12,6 @@
  * @config {Number}             height              Grid height
  * @config {Kinetic.TileSet}    tileSet             The tile set
  * @config {Number[]}           tiles               Array of tile IDs for each spot
- * @config {Function}           spotClass           The map spot container class. Must be Kinetic.TileMap.Spot or
- *                                                  a derivation of it.
  */
 Kinetic.TileSetGridMapLayer = function( config ) {
     // Defaults
@@ -44,8 +42,7 @@ Kinetic.TileSetGridMapLayer.prototype = {
      *  @param  {Number}                spotWidth
      *  @param  {Number}                spotHeight
      */
-    draw: function( drawCtx, gridBounds, spotWidth, spotHeight )
-    {
+    draw: function( drawCtx, gridBounds, spotWidth, spotHeight ) {
         var tiles,
             tileIndexStart, posXStart,
             posX, posY,
@@ -70,26 +67,47 @@ Kinetic.TileSetGridMapLayer.prototype = {
 
             tileIndexStart += this.width;
         }
+    },
+    /*
+     *  Sets the tile at the specified tile position.
+     *  @param    {Number}  tile
+     *  @param    {Number}  x
+     *  @param    {Number}  y
+     */
+    setTile: function( tile, x, y ) {
+        var tileIndex = this._tilePosToIndex( x, y );
+        if( tileIndex === undefined )
+            return;
 
+        this.tiles[ tileIndex] = tile;
+    },
+    /*
+     *  Returns the tile at the specified tile position. May return null for unassigned tile locations...
+     *  @param    {Number}  x
+     *  @param    {Number}  y
+     *
+     *  @returns    {Number}
+     */
+    getTile: function( x, y ) {
+        var tileIndex = this._tilePosToIndex( x, y );
+        if( tileIndex === undefined )
+            return( null );
+
+        return( this.tiles[ tileIndex] );
     },
     /*
      *  Set the tile set
      *  @param    {Kinetic.TileSet} tileSet
      */
-    setTileSet: function( tileSet )
-    {
+    setTileSet: function( tileSet ) {
         var parent = this.getParent();
         this.tileSet = tileSet;
-
-        if( parent != null )
-            parent.invalidateBoundsLocal();
     },
     /*
      *  Returns the grid bounds overlap
      *  @returns    {Kinetic.BoundsRect}
      */
-    getGridBounds: function()
-    {
+    getGridBounds: function() {
         return( new Kinetic.BoundsRect(this.x,this.y,this.width,this.height) );
     },
     /*
@@ -104,8 +122,7 @@ Kinetic.TileSetGridMapLayer.prototype = {
      *  @Overlap    {Number}    top
      *  @Overlap    {Number}    bottom
      */
-    getOverlap: function(spotWidth, spotHeight)
-    {
+    getOverlap: function(spotWidth, spotHeight) {
         var horzOverlap = 0,
             vertOverlap = 0,
             tileSizeMax;
@@ -134,14 +151,27 @@ Kinetic.TileSetGridMapLayer.prototype = {
      *  @param  {Number}                spotWidth
      *  @param  {Number}                spotHeight
      */
-    _drawTile: function( drawCtx, tile, drawPosX, drawPosY, spotWidth, spotHeight )
-    {
+    _drawTile: function( drawCtx, tile, drawPosX, drawPosY, spotWidth, spotHeight ) {
         var width = tile.width,
             height = tile.height;
 
         drawPosX += Math.round( (spotWidth - width) * 0.5 );
         drawPosY += Math.round( (spotHeight - height) * 0.5 );
         drawCtx.drawImage( tile.image, tile.offsetX, tile.offsetY, width, height, drawPosX, drawPosY, width, height );
+    },
+
+    /*
+     *  Get the tile index. Returns undefined if it's undefined...
+     *  @param    {Number}  x
+     *  @param    {Number}  y
+     *
+     *  @returns    {Number}
+     */
+    _tilePosToIndex: function( x, y ) {
+        if( x < this.x || x >= (this.x + this.width) || y < this.y || y >= (this.y + this.height) )
+            return undefined;
+
+        return( x + (y * this.width) );
     }
 };
 // extend GridMapLayer
