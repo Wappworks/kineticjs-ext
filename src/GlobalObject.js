@@ -264,22 +264,36 @@ Kinetic.GlobalObject = {
         this.loopActive = true;
         this._runFrames();
         this.loopActive = false;
-        this._loopUpdateStatus();
+
+        if( this._loopShouldLoop() )
+            this.loopEnabled = true;
+
+        this._scheduleLoop( this.loopEnabled );
     },
     _loopUpdateStatus: function() {
-        // Don't change the update loop status is we're in the loop. Wait until we're done...
+        // Don't change the update loop status is we're in the loop. The loop will take care of itself
         if( this.loopActive )
             return;
 
-        this.loopEnabled = this.tickedList.length > 0 || this.redrawNodes.length > 0;
+        // Determine if we need to enable the loop
+        var shouldLoop = this._loopShouldLoop();
+        if( shouldLoop === this.loopEnabled )
+            return;
 
-        if( this.loopEnabled )
-            this._scheduleLoop();
-        else
-            this.lastUpdateTimeMs = 0;
+        this.loopEnabled = shouldLoop;
+        this._scheduleLoop( shouldLoop );
     },
-    _scheduleLoop: function()
+    _loopShouldLoop: function()
     {
+        return( this.tickedList.length > 0 || this.redrawNodes.length > 0 );
+    },
+    _scheduleLoop: function( doLoop )
+    {
+        if( !doLoop ) {
+            this.lastUpdateTimeMs = 0;
+            return;
+        }
+
         var that = this;
         requestAnimFrame(function() {
             that._loopUpdate();
