@@ -322,6 +322,7 @@ Kinetic.Grid.prototype = {
             {
                 // Draw each layer but keep each layer's draw context pristine
                 drawCtx.save();
+                drawCtx.globalAlpha = layerCurr.getAlpha();
                 layerCurr.draw( drawCtx, layerGridBounds, this.spotWidth, this.spotHeight );
                 drawCtx.restore();
             }

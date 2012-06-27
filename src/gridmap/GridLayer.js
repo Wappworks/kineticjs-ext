@@ -9,6 +9,7 @@
  *
  * @config  {String}    name
  * @config  {Boolean}   visible
+ * @config  {Number}    alpha
  * @config  {Number}    depth
  */
 Kinetic.GridLayer = function(config) {
@@ -16,6 +17,7 @@ Kinetic.GridLayer = function(config) {
     this.name = undefined;
     this.visible = true;
     this.depth = 0;
+    this.alpha = 1;
 
     // Set properties from config
     if(config != null ) {
@@ -46,6 +48,22 @@ Kinetic.GridLayer.prototype = {
      *  @param  {Number}                spotHeight
      */
     draw: function( drawCtx, gridBounds, spotWidth, spotHeight ) {
+    },
+    /*
+     *  Sets the alpha
+     *
+     *  @param  {Number}         alpha
+     */
+    setAlpha: function( alpha ) {
+        this.alpha = alpha;
+    },
+    /*
+     *  Returns true if it's visible. false otherwise.
+     *
+     *  @returns  {Boolean}
+     */
+    getAlpha: function() {
+        return( this.alpha );
     },
     /*
      *  Sets the layer visibility
