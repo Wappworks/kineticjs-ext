@@ -88,6 +88,9 @@ Kinetic.GlobalObject = {
     setFrameUpdateMs: function( updateMs ) {
         this.frameUpdateMs = updateMs;
     },
+    enableFrameRateThrottle: function (isEnabled ) {
+        this.throttleFrameRate = isEnabled;
+    },
     addTicked: function ( fn, context, priority ) {
         var tickedRef = this._tickedListAdd( fn, context, priority );
         this._loopUpdateStatus();
