@@ -58,9 +58,9 @@ Kinetic.GridLayer.prototype = {
         this.alpha = alpha;
     },
     /*
-     *  Returns true if it's visible. false otherwise.
+     *  Returns the alpha
      *
-     *  @returns  {Boolean}
+     *  @returns  {Number}
      */
     getAlpha: function() {
         return( this.alpha );

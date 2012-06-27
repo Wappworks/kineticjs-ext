@@ -52,9 +52,6 @@ Kinetic.RectGridLayer.prototype = {
             posX, posY,
             rowCurr, colCurr, tileIndex;
 
-        if( this.tileSet == null )
-            return;
-
         // If both the stroke and fill are undefined, there's nothign to draw...
         if( this.stroke == null && this.fill == null )
             return;
