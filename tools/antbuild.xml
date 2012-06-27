@@ -38,8 +38,8 @@
 		<file name='${dir.src}/Shape.js'/>
         <file name='${dir.src}/tiles/TileInfo.js'/>
         <file name='${dir.src}/tiles/TileSet.js'/>
-        <file name='${dir.src}/gridmap/GridLayer.js'/>
-        <file name='${dir.src}/gridmap/TileSetGridLayer.js'/>
+        <file name='${dir.src}/grid/GridLayer.js'/>
+        <file name='${dir.src}/grid/TileSetGridLayer.js'/>
         <file name='${dir.src}/shapes/Rect.js'/>
 		<file name='${dir.src}/shapes/Circle.js'/>
 		<file name='${dir.src}/shapes/Image.js'/>
