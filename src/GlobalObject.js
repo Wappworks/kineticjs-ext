@@ -54,6 +54,7 @@ Kinetic.GlobalObject = {
     loopActive: false,
 
     frameUpdateMs: 1000/ 60,
+    throttleFrameRate: false,
     lastUpdateTimeMs: 0,
     isCustomFrameUpdate: false,
     frame: {
@@ -252,10 +253,10 @@ Kinetic.GlobalObject = {
         }
 
         // For browser based updated? We may need to throttle back the update...
-        if( !this.isCustomFrameUpdate ) {
+        if( this.throttleFrameRate && !this.isCustomFrameUpdate ) {
             // Not enough elapsed time? Wait longer...
             if( currTimeMs - this.lastUpdateTimeMs < this.frameUpdateMs ) {
-                this._scheduleLoop();
+                this._scheduleLoop( true );
                 return;
             }
         }
