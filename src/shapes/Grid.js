@@ -319,7 +319,12 @@ Kinetic.Grid.prototype = {
 
             layerGridBounds = drawGridBounds.getOverlapRect( layerCurr.getGridBounds() );
             if( layerGridBounds !== null )
+            {
+                // Draw each layer but keep each layer's draw context pristine
+                drawCtx.save();
                 layerCurr.draw( drawCtx, layerGridBounds, this.spotWidth, this.spotHeight );
+                drawCtx.restore();
+            }
         }
     },
 
