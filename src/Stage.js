@@ -44,9 +44,9 @@ Kinetic.Stage = function(cont, width, height) {
     // set stage id
     this.id = Kinetic.GlobalObject.idCounter++;
 
-    // animation support
-    this.isAnimating = false;
+    // update support
     this.redraw = false;
+    this.tickRef = null;
     this.onFrameFunc = undefined;
 
     this._buildDOM();
@@ -83,15 +83,29 @@ Kinetic.Stage.prototype = {
      * start animation
      */
     start: function() {
-        this.isAnimating = true;
-        Kinetic.GlobalObject._handleAnimation();
+        if( this.tickRef != null )
+            return;
+
+        this.tickRef = Kinetic.GlobalObject.addTicked( function(elapsedSecs){
+            if( this.onFrameFunc != null )
+                this.onFrameFunc( elapsedSecs );
+        }, this, 0 );
     },
     /**
      * stop animation
      */
     stop: function() {
-        this.isAnimating = false;
-        Kinetic.GlobalObject._handleAnimation();
+        if( this.tickRef == null )
+            return;
+
+        this.tickRef.remove();
+        this.tickRef = null;
+    },
+    /**
+     * Determines if stage is animating
+     */
+    isAnimating: function() {
+        return( this.tickRef != null );
     },
     /**
      * mark for redraw
@@ -101,7 +115,7 @@ Kinetic.Stage.prototype = {
             return;
 
         this.redraw = true;
-        Kinetic.GlobalObject._handleAnimation();
+        Kinetic.GlobalObject._redrawListAdd( this );
     },
     /**
      * determines if the layer needs to be redrawn

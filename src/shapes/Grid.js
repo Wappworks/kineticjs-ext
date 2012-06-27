@@ -46,6 +46,10 @@ Kinetic.Grid.prototype = {
         if( layerParent !== undefined )
             layerParent.remove( layer );
 
+        this._layerMap[ layer.id ] = layer;
+        if( layer.name != null )
+            this._layerMap[ layer.name ] = layer;
+
         this._insertIntoList( layer );
         layer.setParent( this );
         this.invalidateBoundsLocal();
@@ -189,10 +193,6 @@ Kinetic.Grid.prototype = {
             indexHigh = layersNum,
             indexInsert,
             compareResult;
-
-        this._layerMap[ layer.id ] = layer;
-        if( layer.name != null )
-            this._layerMap[ layer.name ] = layer;
 
         if( layersNum <= 0 )
         {

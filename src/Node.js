@@ -612,62 +612,6 @@ Kinetic.Node.prototype = {
             layer.markForRedraw();
     },
     /**
-     * transition node to another state.  Any property that can accept a real
-     *  number can be transitioned, including x, y, rotation, alpha, strokeWidth,
-     *  radius, scale.x, scale.y, centerOffset.x, centerOffset.y, etc.
-     * @param {Object} config
-     * @config {Number} [duration] duration that the transition runs in seconds
-     * @config {String} [easing] easing function.  can be linear, ease-in, ease-out, or ease-in-out.
-     *  linear is the default
-     * @config {Function} [callback] callback function to be executed when
-     *  transition completes
-     */
-    transitionTo: function(config) {
-        var layer = this.getLayer();
-        var starts = {};
-
-        /*
-         * clear transition if one is currenlty running.
-         * This make it easy to start new transitions without
-         * having to explicitly cancel old ones
-         */
-        Kinetic.GlobalObject._clearTransition(this);
-
-        for(var key in config) {
-            if( !config.hasOwnProperty(key) ) {
-                continue;
-            }
-
-            if( key === 'duration' || key === 'easing' || key === 'callback') {
-                continue;
-            }
-
-            if(config[key].x !== undefined || config[key].y !== undefined) {
-                starts[key] = {};
-                var propArray = ['x', 'y'];
-                for(var n = 0; n < propArray.length; n++) {
-                    var prop = propArray[n];
-                    if(config[key][prop] !== undefined) {
-                        starts[key][prop] = this[key][prop];
-                    }
-                }
-            }
-            else {
-                starts[key] = this[key];
-            }
-        }
-
-        layer.transitions.push({
-            id: layer.transitionIdCounter++,
-            time: 0,
-            config: config,
-            node: this,
-            starts: starts
-        });
-
-        Kinetic.GlobalObject._handleAnimation();
-    },
-    /**
      * set drag constraint
      * @param {String} constraint
      */

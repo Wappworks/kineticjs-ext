@@ -1,20 +1,58 @@
 ///////////////////////////////////////////////////////////////////////
-//  Global Object
+//  Namespace
 ///////////////////////////////////////////////////////////////////////
 /**
  * Kinetic Namespace
  * @namespace
  */
 var Kinetic = {};
+
+///////////////////////////////////////////////////////////////////////
+//  Ticked Reference
+///////////////////////////////////////////////////////////////////////
+/**
+ * Kinetic Ticked Instance Reference
+ * @constructor
+ *
+ * @param   {Function}  tickFn  tickFn( elapsedSecs:Number ):void
+ * @param   {Object}    context
+ * @param   {Number}    priority
+ */
+Kinetic.TickedRef = function( tickFn, context, priority ) {
+    this.tickFn = tickFn;
+    this.context = context;
+    this.priority = priority;
+};
+
+Kinetic.TickedRef.prototype = {
+    tick: function( elapsedSecs )
+    {
+        this.tickFn.call( this.context, elapsedSecs );
+    },
+    remove: function()
+    {
+        Kinetic.GlobalObject.removeTickedRef( this );
+    }
+};
+
+///////////////////////////////////////////////////////////////////////
+//  Global Object
+///////////////////////////////////////////////////////////////////////
 /**
  * Kinetic Global Object
- * @property {Object} GlobalObjet
+ * @property {Object} GlobalObject
  */
 Kinetic.GlobalObject = {
     stages: [],
     idCounter: 0,
     tempCanvas: null,
-    isLoopActive: false,
+
+    redrawNodes: [],
+    tickedList: [],
+
+    loopEnabled: false,
+    loopActive: false,
+
     frameUpdateMs: 1000/ 60,
     lastUpdateTimeMs: 0,
     isCustomFrameUpdate: false,
@@ -30,6 +68,12 @@ Kinetic.GlobalObject = {
         node: undefined,
         custom: undefined
     },
+    getTempCanvasContext: function() {
+        if( this.tempCanvas == null )
+            this.tempCanvas = document.createElement('canvas');
+
+        return( this.tempCanvas.getContext('2d') );
+    },
     extend: function(obj1, obj2) {
         for(var key in obj2.prototype) {
             if(obj2.prototype.hasOwnProperty(key) && obj1.prototype[key] === undefined) {
@@ -43,182 +87,150 @@ Kinetic.GlobalObject = {
     setFrameUpdateMs: function( updateMs ) {
         this.frameUpdateMs = updateMs;
     },
-    _isaCanvasAnimating: function() {
-        for(var n = 0; n < this.stages.length; n++) {
-            var stage = this.stages[n];
-            if( stage.needsRedraw() )
-                return true;
-            if(stage.isAnimating) {
-                return true;
+    addTicked: function ( fn, context, priority ) {
+        var tickedRef = this._tickedListAdd( fn, context, priority );
+        this._loopUpdateStatus();
+        return( tickedRef );
+    },
+    removeTicked: function ( fn, context, priority ) {
+        if( this._tickedListRemove( fn, context, priority ) )
+            this._loopUpdateStatus();
+    },
+    removeTickedRef: function( tickedRef ) {
+        var tickedList = this.tickedList,
+            index = tickedList.indexOf( tickedRef );
+
+        if( index < 0 )
+            return false;
+
+        tickedList.splice( index, 1 );
+        this._loopUpdateStatus();
+        return true;
+    },
+    _tickedListUpdate: function( elapsedSecs ) {
+        var tickedListCurr = this.tickedList.slice(),
+            listLength = tickedListCurr.length,
+            index;
+
+        for( index = 0; index < listLength; index++ )
+            tickedListCurr[ index ].tick( elapsedSecs );
+    },
+    _tickedListAdd: function( fn, context, priority ) {
+        var tickedRef =  new Kinetic.TickedRef( fn, context, priority ),
+            tickedList = this.tickedList,
+            listLength = tickedList.length,
+            indexLow = 0,
+            indexHigh = listLength,
+            indexInsert,
+            compareResult;
+
+        if( listLength <= 0 ) {
+            tickedList.push( tickedRef );
+            return( tickedRef );
+        }
+
+        do {
+            indexInsert = Math.floor( (indexLow + indexHigh) * 0.5 );
+            compareResult = priority - tickedList[indexInsert].priority;
+
+            // Equivalent? Then, we can insert it...
+            if( compareResult === 0 )
+                break;
+
+            // The layer is to be inserted in the earlier half of the list...
+            if( compareResult < 0 )
+            {
+                // END CONDITION: The current index is the low index. In this case, we're saying that
+                // we want to insert BEFORE the lowest index...
+                if( indexInsert === indexLow )
+                {
+                    break;
+                }
+
+                indexHigh = indexInsert;
+                continue;
             }
 
-            for(var i = 0; i < stage.children.length; i++) {
-                var layer = stage.children[i];
-                if( layer.needsRedraw() )
-                    return true;
-                if(layer.transitions.length > 0) {
-                    return true;
-                }
+            // If we get here, the layer is to be inserted in the latter half of the list...
+            indexInsert++;
+
+            // END CONDITION: The current index is the highest index: In this case, we're saying that
+            // we want to insert AFTER the highest index...
+            if( indexInsert === indexHigh )
+            {
+                break;
+            }
+
+            indexLow = indexInsert;
+        }
+        while( 1 );
+
+        // We've found our insertion point when we get here...
+        if( indexInsert <= 0 ) {
+            tickedList.unshift( tickedRef );
+        } else if( indexInsert >= listLength ) {
+            tickedList.push( tickedRef );
+        } else {
+            tickedList.splice( indexInsert, 0, tickedRef );
+        }
+
+        return( tickedRef );
+    },
+    _tickedListRemove: function( fn, context, priority ) {
+        // If we don't keep the ticked reference, we have to remove it the hard way...
+        var tickedList = this.tickedList,
+            index, listLength, tickedRefCurr;
+
+        for( index = 0, listLength = tickedList.length; index < listLength; index++ )
+        {
+            tickedRefCurr = tickedList[ index ];
+            if( tickedRefCurr.tickFn === fn && tickedRefCurr.context === context && tickedRefCurr.priority === priority )
+            {
+                tickedList.splice( index, 1 );
+                return true;
             }
         }
 
-        this.frame.lastTime = 0;
         return false;
     },
-    _endTransition: function() {
-        var config = this.config;
-        for(var key in config) {
-            if(config.hasOwnProperty(key)) {
-                if(config[key].x !== undefined || config[key].y !== undefined) {
-                    var propArray = ['x', 'y'];
-                    for(var n = 0; n < propArray.length; n++) {
-                        var prop = propArray[n];
-                        if(config[key][prop] !== undefined) {
-                            this.node[key][prop] = config[key][prop];
-                        }
-                    }
-                }
-                else {
-                    this.node[key] = config[key];
-                }
-            }
+    _redrawListAdd: function( node )
+    {
+        if( node.className === "Stage" ) {
+            // Stages go to the front of the queue
+            this.redrawNodes.unshift( node );
+        } else {
+            // Everything else is queued at the back...
+            this.redrawNodes.push( node );
         }
-    },
-    _transitionPow: function(transition, key, prop, powFunc) {
-        var pow = powFunc(),
-            start,
-            change,
-            b;
 
-        var config = transition.config;
-        if(prop !== undefined) {
-            start = transition.starts[key][prop];
-            change = config[key][prop] - start;
-            b = change / (Math.pow(config.duration * 1000, pow));
-            transition.node[key][prop] = b * Math.pow(transition.time, pow) + start;
-        }
-        else {
-            start = transition.starts[key];
-            change = config[key] - start;
-            b = change / (Math.pow(config.duration * 1000, pow));
-            transition.node[key] = b * Math.pow(transition.time, pow) + start;
-        }
+        this._loopUpdateStatus();
     },
-    _chooseTransition: function(transition, key, prop) {
-        var config = transition.config;
-        switch(config.easing) {
-            case 'ease-in':
-                this._transitionPow(transition, key, prop, function() {
-                    return 2.5;
-                });
-                break;
-            case 'ease-out':
-                this._transitionPow(transition, key, prop, function() {
-                    return 0.4;
-                });
-                break;
-            case 'ease-in-out':
-                this._transitionPow(transition, key, prop, function() {
-                    var change = -2.1;
-                    var b = change / (config.duration * 1000);
-                    return 2.5 + b * transition.time;
-                });
-                break;
-            // linear is default
-            default:
-                this._transitionPow(transition, key, prop, function() {
-                    return 1;
-                });
-                break;
-        }
-    },
-    _runTransition: function(transition) {
-        var config = transition.config;
-        for(var key in config) {
-            if( !config.hasOwnProperty(key) ) {
-                continue;
-            }
+    _redrawUpdate: function()
+    {
+        var redrawNodes = this.redrawNodes,
+            listLength = redrawNodes.length,
+            index, redrawNodeCurr;
 
-            if( key === 'duration' || key === 'easing' || key === 'callback') {
-                continue;
-            }
+        if( listLength <= 0 )
+            return;
 
-            if(config[key].x !== undefined || config[key].y !== undefined) {
-                var propArray = ['x', 'y'];
-                for(var n = 0; n < propArray.length; n++) {
-                    var prop = propArray[n];
-                    if(config[key][prop] !== undefined) {
-                        this._chooseTransition(transition, key, prop);
-                    }
-                }
-            }
-            else {
-                this._chooseTransition(transition, key);
-            }
+        // Prepare the redraw nodes list for the next update...
+        this.redrawNodes = [];
+
+        // Update the nodes marked for redraw
+        for( index = 0; index < listLength; index++ )
+        {
+            redrawNodeCurr = redrawNodes[ index ];
+            if( redrawNodeCurr.needsRedraw() )
+                redrawNodeCurr.draw();
         }
     },
-    _clearTransition: function(node) {
-        var layer = node.getLayer();
-        for(var n = 0; n < layer.transitions.length; n++) {
-            if(layer.transitions[n].node.id === node.id) {
-                layer.transitions.splice(n, 1);
-            }
-        }
-    },
+
     _runFrames: function() {
-        for(var n = 0; n < this.stages.length; n++) {
-            var stage = this.stages[n];
-            var stageNeedsRedraw = stage.needsRedraw();
-
-            // run animation if available
-            if(stage.isAnimating && stage.onFrameFunc !== undefined) {
-                stage.onFrameFunc(this.frame);
-            }
-
-            // loop through layers
-            var layers = stage.getChildren();
-            for(var k = 0; k < layers.length; k++) {
-
-                // Update the layer transitions
-                var layer = layers[k];
-                var didTransition = false;
-                // loop through transitions
-                for(var i = 0; i < layer.transitions.length; i++) {
-                    didTransition = true;
-                    var transition = layer.transitions[i];
-                    transition.time += this.frame.timeDiff;
-                    if(transition.time >= transition.config.duration * 1000) {
-                        this._endTransition.apply(transition);
-                        this._clearTransition(transition.node);
-                        if(transition.config.callback !== undefined) {
-                            transition.config.callback();
-                        }
-                    }
-                    else {
-                        this._runTransition(transition);
-                    }
-                }
-
-                // If we're doing a stage redraw, no need to draw per layer...
-                if( stageNeedsRedraw ) {
-                    continue;
-                }
-
-                // Draw the layer individually if it's changed...
-                if( didTransition||layer.needsRedraw() ) {
-                    layer.draw();
-                }
-            }
-
-            // If the stage needs to be redrawn, do it here...
-            if( stageNeedsRedraw ) {
-                stage.draw();
-            }
-        }
+        this._tickedListUpdate( this.frame.timeDiff / 1000 );
+        this._redrawUpdate();
     },
-    _updateFrameObject: function() {
-        var date = new Date();
-        var time = date.getTime();
+    _updateFrameObject: function( time ) {
         if(this.frame.lastTime === 0) {
             this.frame.lastTime = time;
         }
@@ -228,53 +240,50 @@ Kinetic.GlobalObject = {
             this.frame.time += this.frame.timeDiff;
         }
     },
-    _animationLoop: function() {
-        if( !this.isCustomFrameUpdate ) {
-            var currTimeMs = (new Date()).getTime();
-            if( this.lastUpdateTimeMs > 0 ) {
-                // Frame limit!
-                if( currTimeMs - this.lastUpdateTimeMs < this.frameUpdateMs ) {
-                    this._scheduleLoop();
-                    return;
-                }
+    _loopUpdate: function() {
+        if( !this.loopEnabled )
+            return;
 
-                // If we get here, we have an update to process...
-                this.lastUpdateTimeMs = currTimeMs;
-            } else {
-                // First time activation? Do an update!
-                this.lastUpdateTimeMs = currTimeMs;
+        var currTimeMs = (new Date()).getTime();
+        if( this.lastUpdateTimeMs <= 0 )
+        {
+            // First update? The time is the expected elapsed time...
+            this.lastUpdateTimeMs = currTimeMs - this.frameUpdateMs;
+        }
+
+        // For browser based updated? We may need to throttle back the update...
+        if( !this.isCustomFrameUpdate ) {
+            // Not enough elapsed time? Wait longer...
+            if( currTimeMs - this.lastUpdateTimeMs < this.frameUpdateMs ) {
+                this._scheduleLoop();
+                return;
             }
         }
 
-        if(this._isaCanvasAnimating()) {
-            this._updateFrameObject();
-            this._runFrames();
-            this._scheduleLoop();
-            return;
-        }
-
-        this.lastUpdateTimeMs = 0;
-        this.isLoopActive = false;
+        this._updateFrameObject( currTimeMs );
+        this.loopActive = true;
+        this._runFrames();
+        this.loopActive = false;
+        this._loopUpdateStatus();
     },
-    _handleAnimation: function() {
-        if( this.isLoopActive )
+    _loopUpdateStatus: function() {
+        // Don't change the update loop status is we're in the loop. Wait until we're done...
+        if( this.loopActive )
             return;
 
-        this.isLoopActive = true;
-        this._scheduleLoop();
+        this.loopEnabled = this.tickedList.length > 0 || this.redrawNodes.length > 0;
+
+        if( this.loopEnabled )
+            this._scheduleLoop();
+        else
+            this.lastUpdateTimeMs = 0;
     },
     _scheduleLoop: function()
     {
         var that = this;
         requestAnimFrame(function() {
-            that._animationLoop();
+            that._loopUpdate();
         });
-    },
-    getTempCanvasContext: function() {
-        if( this.tempCanvas == null )
-            this.tempCanvas = document.createElement('canvas');
-
-        return( this.tempCanvas.getContext('2d') );
     }
 };
 

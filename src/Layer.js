@@ -14,8 +14,6 @@ Kinetic.Layer = function(config) {
     this.canvas = document.createElement('canvas');
     this.context = this.canvas.getContext('2d');
     this.canvas.style.position = 'absolute';
-    this.transitions = [];
-    this.transitionIdCounter = 0;
     this.redraw = false;
 
     // call super constructors
@@ -116,7 +114,7 @@ Kinetic.Layer.prototype = {
             return;
 
         this.redraw = true;
-        Kinetic.GlobalObject._handleAnimation();
+        Kinetic.GlobalObject._redrawListAdd( this );
     },
     /**
      * determines if the layer needs to be redrawn

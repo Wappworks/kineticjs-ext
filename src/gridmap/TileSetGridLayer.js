@@ -100,7 +100,6 @@ Kinetic.TileSetGridLayer.prototype = {
      *  @param    {Kinetic.TileSet} tileSet
      */
     setTileSet: function( tileSet ) {
-        var parent = this.getParent();
         this.tileSet = tileSet;
     },
     /*
