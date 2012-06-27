@@ -128,7 +128,10 @@ Kinetic.RectGridLayer.prototype = {
      *  @returns    {Number}
      */
     _tilePosToIndex: function( x, y ) {
-        if( x < this.x || x >= (this.x + this.width) || y < this.y || y >= (this.y + this.height) )
+        x -= this.x;
+        y -= this.y;
+
+        if( x < 0 || x >= this.width || y < 0 || y >= this.height )
             return undefined;
 
         return( x + (y * this.width) );

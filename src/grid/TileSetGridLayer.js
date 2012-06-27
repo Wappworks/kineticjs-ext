@@ -48,7 +48,7 @@ Kinetic.TileSetGridLayer.prototype = {
             return;
 
         tiles = this.tiles;
-        tileIndexStart = gridBounds.x + (gridBounds.y * this.width );
+        tileIndexStart = this._tilePosToIndex( gridBounds.x, gridBounds.y );
         posXStart = gridBounds.x * spotWidth;
         for( rowCurr = 0, posY = gridBounds.y * spotHeight; rowCurr < gridBounds.height; rowCurr++, posY += spotHeight )
         {
@@ -163,7 +163,10 @@ Kinetic.TileSetGridLayer.prototype = {
      *  @returns    {Number}
      */
     _tilePosToIndex: function( x, y ) {
-        if( x < this.x || x >= (this.x + this.width) || y < this.y || y >= (this.y + this.height) )
+        x -= this.x;
+        y -= this.y;
+
+        if( x < 0 || x >= this.width || y < 0 || y >= this.height )
             return undefined;
 
         return( x + (y * this.width) );
