@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////
-//  TileSetGridLayer
+//  RectGridLayer
 ///////////////////////////////////////////////////////////////////////
 /**
- * TileSetGridLayer constructor
+ * RectGridLayer constructor
  * @constructor
  * @param {Object} config
  *
@@ -10,26 +10,34 @@
  * @config {Number}             y                   Starting grid y-position
  * @config {Number}             width               Grid width
  * @config {Number}             height              Grid height
- * @config {Kinetic.TileSet}    tileSet             The tile set
- * @config {Number[]}           tiles               Array of tile IDs for each spot
+ * @config {String}             fill                The fill style
+ * @config {String}             stroke              The stroke style
+ * @config {Number}             strokeWidth         The stroke width
+ * @config {Number}             tiles               The grid fill status (0 - unfilled, anything else - filled)
  */
-Kinetic.TileSetGridLayer = function( config ) {
+Kinetic.RectGridLayer = function( config ) {
+    var index, length;
+
     // Defaults
     this.x = 0;
     this.y = 0;
     this.width = 0;
     this.height = 0;
-    this.tileSet = new Kinetic.TileSet();
-    this.tiles = null;
+    this.fill = undefined;
+    this.stroke = undefined;
+    this.strokeWidth = undefined;
 
     // Initialize from the base class
     Kinetic.GridLayer.call(this, config);
 
-    if( this.tiles == null )
+    if( this.tiles == null ) {
         this.tiles = new Array( this.width * this.height );
+        for( index = 0, length = this.tiles.length; index < length; index++ )
+            this.tiles[ index ] = 0;
+    }
 };
 
-Kinetic.TileSetGridLayer.prototype = {
+Kinetic.RectGridLayer.prototype = {
     /*
      *  Draws the layer
      *
@@ -42,26 +50,43 @@ Kinetic.TileSetGridLayer.prototype = {
         var tiles,
             tileIndexStart, posXStart,
             posX, posY,
-            rowCurr, colCurr, tileIndex, tileCurr;
+            rowCurr, colCurr, tileIndex;
 
         if( this.tileSet == null )
             return;
 
+        // If both the stroke and fill are undefined, there's nothign to draw...
+        if( this.stroke == null && this.fill == null )
+            return;
+
         tiles = this.tiles;
-        tileIndexStart = gridBounds.x + (gridBounds.y * this.width );
+        tileIndexStart = this._tilePosToIndex( gridBounds.x, gridBounds.y );
         posXStart = gridBounds.x * spotWidth;
+
+        drawCtx.beginPath();
         for( rowCurr = 0, posY = gridBounds.y * spotHeight; rowCurr < gridBounds.height; rowCurr++, posY += spotHeight )
         {
             for( colCurr = 0, tileIndex = tileIndexStart, posX = posXStart; colCurr < gridBounds.width; colCurr++, tileIndex++, posX += spotWidth )
             {
-                tileCurr = this.tileSet.getTile( tiles[tileIndex] );
-                if( tileCurr == null )
+                if( tiles[ tileIndex ] === 0 )
                     continue;
 
-                this._drawTile( drawCtx, tileCurr, posX, posY, spotWidth, spotHeight );
+                drawCtx.rect( posX, posY, spotWidth, spotHeight );
             }
 
             tileIndexStart += this.width;
+        }
+        drawCtx.closePath();
+
+        // Do the actual filling and line drawing...
+        if(this.fill != null) {
+            drawCtx.fillStyle = this.fill;
+            drawCtx.fill();
+        }
+        if(this.stroke != null) {
+            drawCtx.lineWidth = this.strokeWidth == null ? 1 : this.strokeWidth;
+            drawCtx.strokeStyle = this.stroke;
+            drawCtx.stroke();
         }
     },
     /*
@@ -92,69 +117,12 @@ Kinetic.TileSetGridLayer.prototype = {
         return( this.tiles[ tileIndex] );
     },
     /*
-     *  Set the tile set
-     *  @param    {Kinetic.TileSet} tileSet
-     */
-    setTileSet: function( tileSet ) {
-        this.tileSet = tileSet;
-    },
-    /*
      *  Returns the grid bounds overlap
      *  @returns    {Kinetic.BoundsRect}
      */
     getGridBounds: function() {
         return( new Kinetic.BoundsRect(this.x,this.y,this.width,this.height) );
     },
-    /*
-     *  Returns the grid bounds overlap
-     *  @param      {Number}    spotWidth
-     *  @param      {Number}    spotHeight
-     *
-     *  @returns    {Overlap}
-     *
-     *  @Overlap    {Number}    left
-     *  @Overlap    {Number}    right
-     *  @Overlap    {Number}    top
-     *  @Overlap    {Number}    bottom
-     */
-    getOverlap: function(spotWidth, spotHeight) {
-        var horzOverlap = 0,
-            vertOverlap = 0,
-            tileSizeMax;
-
-        // Assumes that the tiles are drawn from the center out
-        if( this.tileSet != null )
-        {
-            tileSizeMax = this.tileSet.getTileSizeMax();
-            horzOverlap = Math.max(0, Math.ceil( (tileSizeMax.x - spotWidth) * 0.5 / spotWidth ) );
-            vertOverlap = Math.max(0, Math.ceil( (tileSizeMax.y - spotHeight) * 0.5 / spotHeight ) );
-        }
-
-        return( {
-            left: 0,
-            right: horzOverlap,
-            top: 0,
-            bottom: vertOverlap
-        } );
-    },
-    /*
-     *  Draw a tile at the specified spot
-     *  @param  {CanvasContext}         drawCtx
-     *  @param  {Kinetic.TileInfo}      tile
-     *  @param  {Number}                drawPosX
-     *  @param  {Number}                drawPosY
-     *  @param  {Number}                spotWidth
-     *  @param  {Number}                spotHeight
-     */
-    _drawTile: function( drawCtx, tile, drawPosX, drawPosY, spotWidth, spotHeight ) {
-        var width = tile.width,
-            height = tile.height;
-
-        drawPosX += Math.round( (spotWidth - width) * 0.5 );
-        drawPosY += Math.round( (spotHeight - height) * 0.5 );
-        drawCtx.drawImage( tile.image, tile.offsetX, tile.offsetY, width, height, drawPosX, drawPosY, width, height );
-    },
-
     /*
      *  Get the tile index. Returns undefined if it's undefined...
      *  @param    {Number}  x
@@ -170,4 +138,4 @@ Kinetic.TileSetGridLayer.prototype = {
     }
 };
 // extend GridLayer
-Kinetic.GlobalObject.extend(Kinetic.TileSetGridLayer, Kinetic.GridLayer);
+Kinetic.GlobalObject.extend(Kinetic.RectGridLayer, Kinetic.GridLayer);
