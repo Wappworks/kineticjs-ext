@@ -14,6 +14,7 @@ Kinetic.AnimateQueue = function( config ) {
         config = {};
 
     this.completeFn = config.complete != null ? config.complete : undefined;
+    this.loop = false;
 
     this._queue = [];
     this._playIndex = -1;
@@ -49,6 +50,10 @@ Kinetic.AnimateQueue.prototype = {
 
         Kinetic.GlobalObject.functionWrap( anim, "complete", function( prevFn ){
             prevFn.call( this );
+
+            // If the animation is looped, we keep waiting...
+            if( this.isLooped() )
+                return;
 
             queue._onAnimComplete();
         });
@@ -89,18 +94,44 @@ Kinetic.AnimateQueue.prototype = {
     isPlaying: function() {
         return( this._playIndex >= 0 );
     },
+    /*
+     * Set the playback loop state
+     */
+    setLooped: function( isLooped ) {
+        this.loop = isLoop;
+    },
+    /*
+     * Returns the playback loop state
+     *
+     * @returns {Boolean|   true if playback will loop
+     */
+    isLooped: function() {
+        return( this.loop );
+    },
     /**
      * Called when the animation queue is complete
      */
     complete: function() {
+        var isLoopedOnEntry = this.loop;
+
         // Not playing? We're done
         if( !this.isPlaying() )
             return;
 
+        // If we're not looping, we call stop before the completion function
+        if( !isLoopedOnEntry )
+            this.stop();
+
         if( this.completeFn instanceof Function )
             this.completeFn();
 
-        this.stop();
+        // If we were looping on entry and there's no change to the playback status, we restart the playback
+        // This is so that the completion function can turn off the loop flag and not affect playback...
+        if( isLoopedOnEntry && this.isPlaying() )
+        {
+            this._playIndex = 0;
+            this._queue[ this._playIndex ].play();
+        }
     },
     /*
      *  Callback when an animation completes

@@ -40,6 +40,14 @@ Kinetic.NodeExtAnimate.prototype = {
         this._animQueue = undefined;
     },
     /*
+     *  Returns the animation state
+     *
+     *  @return {Boolean}          true if animating...
+     */
+    isAnimating: function() {
+        return( this._animQueue != null );
+    },
+    /*
      *  Returns the completion callback
      *
      *  @returns    {Function}  The callback function;

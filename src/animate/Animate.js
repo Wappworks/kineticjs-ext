@@ -22,6 +22,7 @@ Kinetic.Animate = function(config) {
     this.easingFn = config.easing instanceof Function ? config.easing : Kinetic.Easing.linear;
     this.updateFn   = config.updateFn instanceof Function ? config.updateFn : undefined;
     this.completeFn = config.completeFn instanceof Function ? config.completeFn : undefined;
+    this.loop = false;
 
     this._tickRef = null;
     this._elapsedSecs = 0;
@@ -71,6 +72,20 @@ Kinetic.Animate.prototype = {
     isPlaying: function() {
         return( this._tickRef != null );
     },
+    /*
+     * Set the playback loop state
+     */
+    setLooped: function( isLooped ) {
+        this.loop = isLoop;
+    },
+    /*
+     * Returns the playback loop state
+     *
+     * @returns {Boolean|   true if playback will loop
+     */
+    isLooped: function() {
+        return( this.loop );
+    },
     /**
      * Animation update function
      *
@@ -105,14 +120,26 @@ Kinetic.Animate.prototype = {
      * Animation complete function
      */
     complete: function() {
+        var isLoopedOnEntry = this.loop;
+
         // Not playing? We're done
         if( !this.isPlaying() )
             return;
 
-        this.stop();
+        // If we're not looping, we call stop before the completion function
+        if( !isLoopedOnEntry )
+            this.stop();
 
         if( this.completeFn instanceof Function )
             this.completeFn();
+
+        // If we were looping on entry and there's no change to the playback status, we restart the playback
+        // This is so that the completion function can turn off the loop flag and not affect playback...
+        if( isLoopedOnEntry && this.isPlaying() )
+        {
+            this.stop();
+            this.play();
+        }
     },
 
     /**
