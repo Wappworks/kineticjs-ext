@@ -7,14 +7,15 @@
  *
  * @param   {Object}    [config]
  *
- * @config  {Function}  complete    Completion callback function
+ * @config  {Boolean}   [loop]      Loop state.
+ * @config  {Function}  [complete]  Completion callback function
  */
 Kinetic.AnimateQueue = function( config ) {
     if( config == null )
         config = {};
 
+    this.loop = config.loop != null ? config.loop : false;
     this.completeFn = config.complete != null ? config.complete : undefined;
-    this.loop = false;
 
     this._queue = [];
     this._playIndex = -1;

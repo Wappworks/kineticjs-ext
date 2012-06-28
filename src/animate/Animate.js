@@ -8,9 +8,11 @@
  *
  * @Config  {Object}    target          The instance to animate
  * @Config  {Object}    to              List of parameters and their final values
+ * @Config  {Number}    duration        The animation length (secs)
+ *
  * @Config  {Object}    [from]          List of parameters to start from. If not specified, it will use the object value
  * @Config  {Function}  [easing]        The easing function to use fn(t:Number, b:Number, c:Number)
- * @Config  {Number}    duration        The animation length (secs)
+ * @Config  {Boolean}   [loop]           True if the animation loops. False otherwise.
  * @Config  {Function}  [updateFn]      Update callback function
  * @Config  {Function}  [completeFn]    Completion callback function
  */
@@ -19,10 +21,10 @@ Kinetic.Animate = function(config) {
     this.endConfig = config.to;
     this.startConfig = config.from;
     this.duration = Math.max( 0, config.duration );
+    this.loop = config.loop != null ? config.loop : false;
     this.easingFn = config.easing instanceof Function ? config.easing : Kinetic.Easing.linear;
     this.updateFn   = config.updateFn instanceof Function ? config.updateFn : undefined;
     this.completeFn = config.completeFn instanceof Function ? config.completeFn : undefined;
-    this.loop = false;
 
     this._tickRef = null;
     this._elapsedSecs = 0;
