@@ -99,7 +99,7 @@ Kinetic.AnimateQueue.prototype = {
      * Set the playback loop state
      */
     setLooped: function( isLooped ) {
-        this.loop = isLoop;
+        this.loop = isLooped;
     },
     /*
      * Returns the playback loop state

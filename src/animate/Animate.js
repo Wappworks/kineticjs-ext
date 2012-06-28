@@ -78,7 +78,7 @@ Kinetic.Animate.prototype = {
      * Set the playback loop state
      */
     setLooped: function( isLooped ) {
-        this.loop = isLoop;
+        this.loop = isLooped;
     },
     /*
      * Returns the playback loop state
@@ -101,7 +101,7 @@ Kinetic.Animate.prototype = {
         this._elapsedSecs += elapsedSecs;
 
         // Figure out where we are in the animation...
-        t = Math..min( 1, this._elapsedSecs / this.duration );
+        t = Math.min( 1, this._elapsedSecs / this.duration );
 
         // Animate all the properties using the start values as the reference as it's filtered...
         for( key in this._startValues )
@@ -163,7 +163,7 @@ Kinetic.Animate.prototype = {
         for( key in config ) {
             if( !config.hasOwnProperty(key) )
                 continue;
-            if( target[key] != null )
+            if( target[key] == null )
                 continue;
 
             target[key] = config[key];
@@ -183,7 +183,7 @@ Kinetic.Animate.prototype = {
             {
                 if( !config.hasOwnProperty(key) )
                     continue;
-                if( target[key] != null )
+                if( target[key] == null )
                     continue;
 
                 db[key] = target[key];
