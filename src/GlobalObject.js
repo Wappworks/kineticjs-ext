@@ -19,6 +19,9 @@ var Kinetic = {};
  * @param   {Number}    priority
  */
 Kinetic.TickedRef = function( tickFn, context, priority ) {
+    if( typeof priority != "number" )
+        priority = 0;
+
     this.tickFn = tickFn;
     this.context = context;
     this.priority = priority;
@@ -80,6 +83,16 @@ Kinetic.GlobalObject = {
             if(obj2.prototype.hasOwnProperty(key) && obj1.prototype[key] === undefined) {
                 obj1.prototype[key] = obj2.prototype[key];
             }
+        }
+    },
+    functionWrap: function(target, funcName, wrapperFn) {
+        var prevFn = target[ funcName ];
+
+        target[ funcName ] = function() {
+            var argList = Array.prototype.slice.call( arguments );
+
+            argList.unshift( prevFn );
+            return( wrapperFn.apply( target, argList ) );
         }
     },
     setFrameRate: function( updateHz ) {

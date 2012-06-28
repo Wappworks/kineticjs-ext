@@ -26,6 +26,7 @@ Kinetic.Shape = function(config) {
 
     // call super constructor
     Kinetic.Node.apply(this, [config]);
+    Kinetic.NodeExtAnimate.apply(this);
 };
 /*
  * Shape methods
@@ -180,3 +181,5 @@ Kinetic.Shape.prototype = {
 
 // extend Node
 Kinetic.GlobalObject.extend(Kinetic.Shape, Kinetic.Node);
+// extend NodeExtAnimate
+Kinetic.GlobalObject.extend(Kinetic.Shape, Kinetic.NodeExtAnimate);
