@@ -2,6 +2,12 @@
 
 ## Development
 ### New Features:
+- New update loop functionality that any system can tie into: Kinetic.GlobalObject::addTicked
+- Replaced Eric Rowell's transition system with a new flexible animation system
+  - To animate shapes, use Kinetic.Shape.animate(). Multiple calls to animate() will queue the animations in
+    succession.
+  - The system supports cross-shape animation through Kinetic.AnimateQueue
+- Added a library of easing functions: Kinetic.Easing
 - Kinetic.TileSet
   - Added support for tilesets/spritesheets
     - Tileset support is compatible with [Tiled map editor](http://www.mapeditor.org/) tilesets
